@@ -89,6 +89,17 @@
                 <!-- Menu Contextuel Déroulant (Speed Dial) -->
                 <div class="fab-menu-list" id="fabMenuList">
                     
+                    <!-- 0. Bascule Thème Clair / Sombre -->
+                    <button class="fab-menu-item" id="theme-toggle" aria-label="Basculer le thème">
+                        <span class="fab-item-label" id="theme-label">Mode Sombre</span>
+                        <div class="fab-item-btn">
+                            <svg id="theme-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                <!-- Icone Lune par défaut (car on sera en Light mode par défaut) -->
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                            </svg>
+                        </div>
+                    </button>
+
                     <!-- 1. Importer un GPX -->
                     <button class="fab-menu-item" id="btnGpx" aria-label="Importer un fichier GPX">
                         <span class="fab-item-label">Importer un GPX</span>

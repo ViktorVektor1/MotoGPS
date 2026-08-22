@@ -12,24 +12,24 @@
  */
 
 :root {
-    /* Palette Sombre Mate */
-    --bg-matte: rgba(20, 20, 22, 0.85);
-    --bg-matte-solid: #161618;
-    --bg-button: rgba(36, 36, 40, 0.92);
-    --bg-button-active: #2c2c30;
-    --border-subtle: rgba(255, 255, 255, 0.10);
+    /* Palette Claire (Par défaut) */
+    --bg-matte: rgba(255, 255, 255, 0.90);
+    --bg-matte-solid: #ffffff;
+    --bg-button: rgba(240, 240, 240, 0.92);
+    --bg-button-active: #e5e5ea;
+    --border-subtle: rgba(0, 0, 0, 0.10);
     
-    /* Couleurs fonctionnelles solides (Solid Colors) */
-    --accent-blue: #0a84ff;
-    --accent-green: #30d158;
-    --accent-orange: #ff9f0a;
-    --accent-red: #ff453a;
-    
-    /* Typographie */
-    --text-primary: #ffffff;
+    /* Typographie Claire */
+    --text-primary: #000000;
     --text-secondary: #8e8e93;
     --text-tertiary: #636366;
     
+    /* Couleurs fonctionnelles (communes ou très proches) */
+    --accent-blue: #007aff;
+    --accent-green: #34c759;
+    --accent-orange: #ff9500;
+    --accent-red: #ff3b30;
+
     --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, Roboto, sans-serif;
     --font-mono: "SF Mono", "Roboto Mono", monospace;
     
@@ -38,6 +38,26 @@
     --radius-card: 16px;
     --radius-button: 14px;
     --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-theme {
+    /* Palette Sombre Mate (Ancien défaut) */
+    --bg-matte: rgba(20, 20, 22, 0.85);
+    --bg-matte-solid: #161618;
+    --bg-button: rgba(36, 36, 40, 0.92);
+    --bg-button-active: #2c2c30;
+    --border-subtle: rgba(255, 255, 255, 0.10);
+    
+    /* Typographie Sombre */
+    --text-primary: #ffffff;
+    --text-secondary: #8e8e93;
+    --text-tertiary: #636366;
+
+    /* Couleurs fonctionnelles */
+    --accent-blue: #0a84ff;
+    --accent-green: #30d158;
+    --accent-orange: #ff9f0a;
+    --accent-red: #ff453a;
 }
 
 /* Reset & Plein Écran */
@@ -54,7 +74,7 @@ html, body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background-color: #121212;
+    background-color: var(--bg-matte-solid);
     color: var(--text-primary);
     font-family: var(--font-stack);
     position: fixed;
@@ -87,7 +107,7 @@ html, body {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 1000;
+    z-index: 9999;
     pointer-events: none;
     display: flex;
     flex-direction: column;
@@ -302,6 +322,7 @@ html, body {
     align-items: center;
     gap: 10px;
     cursor: pointer;
+    pointer-events: auto;
     background: transparent;
     border: none;
     outline: none;
@@ -335,6 +356,8 @@ html, body {
     justify-content: center;
     box-shadow: var(--shadow-soft);
     transition: transform 0.12s, background-color 0.15s;
+    pointer-events: auto;
+    cursor: pointer;
 }
 
 .fab-menu-item:active .fab-item-btn {
@@ -369,6 +392,7 @@ html, body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    pointer-events: auto;
     box-shadow: var(--shadow-soft);
     transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s;
     outline: none;
@@ -389,7 +413,7 @@ html, body {
 }
 
 .fab-container.open .fab-main-trigger {
-    background-color: #242428;
+    background-color: var(--bg-button);
 }
 
 .fab-container.open .fab-main-trigger svg {
@@ -404,7 +428,7 @@ html, body {
     width: 100vw;
     height: 100vh;
     background: transparent;
-    z-index: 1020;
+    z-index: 9998;
     display: none;
     pointer-events: auto;
 }
@@ -455,7 +479,7 @@ html, body {
     background: rgba(0, 0, 0, 0.65);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    z-index: 2000;
+    z-index: 10000;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -533,6 +557,7 @@ html, body {
     font-size: 0.92rem;
     font-weight: 600;
     cursor: pointer;
+    pointer-events: auto;
     border: none;
     transition: transform 0.1s, opacity 0.15s;
 }
@@ -574,7 +599,7 @@ html, body {
     opacity: 0;
     pointer-events: none;
     transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s;
-    z-index: 3000;
+    z-index: 10001;
     text-align: center;
     white-space: nowrap;
 }

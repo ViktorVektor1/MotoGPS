@@ -62,13 +62,27 @@
         tileCountStat: document.getElementById('tileCountStat'),
         btnConfirmDownload: document.getElementById('btnConfirmDownload'),
         btnCancelModal: document.getElementById('btnCancelModal'),
-        toastMsg: document.getElementById('toastMsg')
+        toastMsg: document.getElementById('toastMsg'),
+        themeToggle: document.getElementById('theme-toggle'),
+        themeLabel: document.getElementById('theme-label'),
+        themeIcon: document.getElementById('theme-icon')
     };
 
+    // URLs des fonds de carte CartoDB
+    const lightUrl = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+    const darkUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+
     // =========================================================================
-    // 1. INITIALISATION CARTE LEAFLET (CartoDB Dark Matter)
+    // 1. INITIALISATION CARTE LEAFLET
     // =========================================================================
     function initMap() {
+        // Lecture du thème sauvegardé ou clair par défaut
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+        }
+        updateThemeButtonUI(savedTheme);
+
         state.map = L.map('map', {
             center: DEFAULT_COORDS,
             zoom: DEFAULT_ZOOM,
@@ -77,8 +91,9 @@
             preferCanvas: true
         });
 
-        // Fond de carte sombre mat CartoDB Dark Matter
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        // Initialisation de la couche de tuiles avec l'URL correspondant au thème
+        const currentUrl = savedTheme === 'dark' ? darkUrl : lightUrl;
+        state.tileLayer = L.tileLayer(currentUrl, {
             maxZoom: 19,
             subdomains: ['a', 'b', 'c', 'd']
         }).addTo(state.map);
@@ -465,6 +480,13 @@
 
         dom.menuBackdrop.addEventListener('click', () => closeMenu());
 
+        // Action : Bascule Thème Clair / Sombre
+        dom.themeToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleTheme();
+            closeMenu();
+        });
+
         // Action : Recentrer sur le GPS
         dom.btnRecenter.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -481,18 +503,55 @@
         });
     }
 
-    function toggleMenu() {
-        state.isMenuOpen ? closeMenu() : openMenu();
+    function toggleTheme() {
+        const isDark = document.body.classList.toggle('dark-theme');
+        const newTheme = isDark ? 'dark' : 'light';
+        localStorage.setItem('theme', newTheme);
+        
+        // Mettre à jour la carte sans recharger la page
+        const newUrl = isDark ? darkUrl : lightUrl;
+        if (state.tileLayer) {
+            state.tileLayer.setUrl(newUrl);
+        }
+
+        updateThemeButtonUI(newTheme);
     }
 
-    function openMenu() {
-        state.isMenuOpen = true;
-        dom.fabContainer.classList.add('open');
-        dom.fabTrigger.setAttribute('aria-expanded', 'true');
-        dom.menuBackdrop.classList.add('active');
+    function updateThemeButtonUI(theme) {
+        if (!dom.themeLabel || !dom.themeIcon) return;
+        
+        if (theme === 'dark') {
+            dom.themeLabel.textContent = 'Mode Clair';
+            // Icône Soleil
+            dom.themeIcon.innerHTML = `
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            `;
+        } else {
+            dom.themeLabel.textContent = 'Mode Sombre';
+            // Icône Lune
+            dom.themeIcon.innerHTML = `
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            `;
+        }
+    }
+
+    function toggleMenu() {
+        state.isMenuOpen = !state.isMenuOpen;
+        dom.fabContainer.classList.toggle('open', state.isMenuOpen);
+        dom.fabTrigger.setAttribute('aria-expanded', String(state.isMenuOpen));
+        dom.menuBackdrop.classList.toggle('active', state.isMenuOpen);
     }
 
     function closeMenu() {
+        if (!state.isMenuOpen) return;
         state.isMenuOpen = false;
         dom.fabContainer.classList.remove('open');
         dom.fabTrigger.setAttribute('aria-expanded', 'false');
@@ -645,11 +704,9 @@
     // =========================================================================
     function registerServiceWorker() {
         if ('serviceWorker' in navigator) {
-            // Enregistrement avec chemin relatif strict './sw.js'
-            // Vérifie si la page est déjà chargée pour éviter la race condition
-            // DOMContentLoaded → window.load (le listener load ne serait jamais appelé)
+            // Chemin absolu pour GitHub Pages : viktorvektor1.github.io/MotoGPS/
             const doRegister = () => {
-                navigator.serviceWorker.register('./sw.js')
+                navigator.serviceWorker.register('/MotoGPS/sw.js', { scope: '/MotoGPS/' })
                     .then(reg => console.log('[SW] Enregistré sur le scope :', reg.scope))
                     .catch(err => console.warn('[SW] Échec enregistrement :', err));
             };

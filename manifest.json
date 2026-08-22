@@ -1,8 +1,8 @@
 {
   "name": "MotoGPS - Navigation",
   "short_name": "MotoGPS",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "/MotoGPS/",
+  "scope": "/MotoGPS/",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#121212",

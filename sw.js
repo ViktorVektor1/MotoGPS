@@ -10,15 +10,15 @@
 const CACHE_APP_SHELL = 'motogps-shell-v2';
 const CACHE_TILES = 'motogps-tiles-v2';
 
-// Chemins relatifs stricts pour compatibilité sous-dossier GitHub Pages
+// Chemins absolus pour GitHub Pages : viktorvektor1.github.io/MotoGPS/
 const APP_SHELL_FILES = [
-    './',
-    './index.html',
-    './style.css',
-    './app.js',
-    './geo-math.js',
-    './manifest.json',
-    './icon.svg',
+    '/MotoGPS/',
+    '/MotoGPS/index.html',
+    '/MotoGPS/style.css',
+    '/MotoGPS/app.js',
+    '/MotoGPS/geo-math.js',
+    '/MotoGPS/manifest.json',
+    '/MotoGPS/icon.svg',
     'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
     'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
 ];
@@ -111,7 +111,7 @@ self.addEventListener('fetch', (event) => {
                 return networkResponse;
             }).catch(() => {
                 if (event.request.headers.get('accept')?.includes('text/html')) {
-                    return caches.match('./index.html') || caches.match('./');
+                    return caches.match('/MotoGPS/index.html') || caches.match('/MotoGPS/');
                 }
             });
         })
