@@ -467,11 +467,13 @@ const GeoMath = (function () {
                     const key = `${z}/${x}/${y}`;
                     if (!seen.has(key)) {
                         seen.add(key);
+                        // Serveurs subdomains 'a', 'b', 'c', 'd' pour CartoDB Dark Matter
+                        const sub = ['a', 'b', 'c', 'd'][(x + y) % 4];
                         tiles.push({
                             z: z,
                             x: x,
                             y: y,
-                            url: `https://tile.openstreetmap.org/${z}/${x}/${y}.png`
+                            url: `https://${sub}.basemaps.cartocdn.com/dark_all/${z}/${x}/${y}.png`
                         });
                     }
                 }

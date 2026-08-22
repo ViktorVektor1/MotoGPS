@@ -68,8 +68,8 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
 
-    // A. Interception des tuiles de carte OpenStreetMap (tile.openstreetmap.org)
-    if (url.hostname.includes('tile.openstreetmap.org') || url.pathname.match(/\/\d+\/\d+\/\d+\.png$/)) {
+    // A. Interception des tuiles de carte (CartoDB Dark Matter / OpenStreetMap)
+    if (url.hostname.includes('cartocdn.com') || url.hostname.includes('tile.openstreetmap.org') || url.pathname.match(/\/\d+\/\d+\/\d+(\.png|@[23]x\.png)?$/)) {
         event.respondWith(
             caches.open(CACHE_TILES).then(async (tileCache) => {
                 const cachedResponse = await tileCache.match(event.request);

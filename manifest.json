@@ -1,12 +1,12 @@
 {
-  "name": "MotoGPS - Navigation Moto Pure",
+  "name": "MotoGPS - Navigation",
   "short_name": "MotoGPS",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#000000",
-  "theme_color": "#000000",
-  "description": "Système de navigation GPS pour moto avec anticipation dynamique des virages, lisibilité plein soleil et fonctionnement 100% hors-ligne.",
+  "background_color": "#121212",
+  "theme_color": "#121212",
+  "description": "Système de navigation GPS pour moto avec anticipation dynamique des virages, lisibilité maximale et fonctionnement hors-ligne.",
   "categories": ["navigation", "travel", "utilities"],
   "icons": [
     {
