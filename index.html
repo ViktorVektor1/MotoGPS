@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="PWA GPS Moto haute visibilité avec anticipation dynamique des virages et cache hors-ligne">
+    
+    <title>MotoGPS - Navigation Pure</title>
+
+    <!-- Manifest PWA & Favicon -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <link rel="apple-touch-icon" href="icon.svg">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+          crossorigin="" />
+
+    <!-- Style Spécifique Moto Haute Visibilité -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 1. Carte Leaflet Plein Écran -->
+    <div id="map" class="dark-tiles"></div>
+
+    <!-- 2. Cockpit / Interface Tête Haute (HUD) -->
+    <div class="hud-container">
+        
+        <!-- SECTION SUPÉRIEURE DU HUD -->
+        <header class="hud-top">
+            <!-- Barre de Statuts Globale -->
+            <div class="status-bar">
+                <div class="status-badge" id="gpsStatusBadge">
+                    <span class="status-dot" id="gpsDot"></span>
+                    <span id="gpsText">GPS RECH.</span>
+                </div>
+                <div class="status-badge" id="wakeLockBadge" title="Maintien de l'écran allumé">
+                    <span class="status-dot active" id="wakeLockDot"></span>
+                    <span>ÉCRAN ACTIF</span>
+                </div>
+                <div class="status-badge" id="zoomBadge">
+                    <span style="color: var(--neon-cyan);">ZOOM:</span>
+                    <span id="zoomValue" style="font-family: var(--font-mono); font-weight: 800;">16</span>
+                </div>
+            </div>
+
+            <!-- Double Affichage : Vitesse & Anticipation de Virage -->
+            <div class="hud-main-display">
+                <!-- Tachymètre -->
+                <div class="speedometer-card" aria-label="Compteur de vitesse">
+                    <div class="speed-value" id="speedValue">0</div>
+                    <div class="speed-unit">KM/H</div>
+                </div>
+
+                <!-- Carte d'Anticipation de Virage Dynamique -->
+                <div class="turn-anticipation-card" id="turnCard">
+                    <div class="turn-icon-box" id="turnIconBox">
+                        <!-- Icône SVG dynamique (tout droit par défaut) -->
+                        <svg class="turn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="19" x2="12" y2="5"></line>
+                            <polyline points="5 12 12 5 19 12"></polyline>
+                        </svg>
+                    </div>
+                    <div class="turn-info">
+                        <div class="turn-distance" id="turnDistance">-- m</div>
+                        <div class="turn-title" id="turnTitle">EN ATTENTE GPX</div>
+                        <div class="turn-subtitle" id="turnSubtitle">Chargez un tracé</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- SECTION INFÉRIEURE : COMMANDES MASSIVES (GANTS MOTO) -->
+        <footer class="hud-bottom">
+            <!-- Bouton Centrage / Suivi GPS -->
+            <button class="action-btn btn-recenter following" id="btnRecenter" title="Centrer sur la position GPS" aria-label="Centrer la carte">
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polygon points="12 8 8 12 12 16 16 12 12 8"></polygon>
+                    <line x1="12" y1="2" x2="12" y2="4"></line>
+                    <line x1="12" y1="20" x2="12" y2="22"></line>
+                    <line x1="2" y1="12" x2="4" y2="12"></line>
+                    <line x1="20" y1="12" x2="22" y2="12"></line>
+                </svg>
+                <span>SUIVI</span>
+            </button>
+
+            <!-- Bouton Import Fichier GPX -->
+            <button class="action-btn btn-gpx" id="btnGpx" title="Importer une trace GPX" aria-label="Importer GPX">
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                    <line x1="4" y1="22" x2="4" y2="15"></line>
+                </svg>
+                <span>GPX</span>
+            </button>
+            <input type="file" id="gpxFileInput" accept=".gpx,application/gpx+xml,text/xml" />
+
+            <!-- Bouton Mode Hors-Ligne (Téléchargement Tuiles) -->
+            <button class="action-btn btn-offline" id="btnOffline" title="Télécharger la carte hors-ligne" aria-label="Mode Hors-ligne">
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>OFFLINE</span>
+            </button>
+
+            <!-- Bouton Inversion Contraste / Thème Carte -->
+            <button class="action-btn" id="btnMapStyle" title="Basculer le style de carte (OLED Sombre / Naturel)" aria-label="Style Carte">
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+                <span>STYLE</span>
+            </button>
+        </footer>
+
+    </div>
+
+    <!-- 3. Boîte de Dialogue Modale : Téléchargement Tuiles Hors-Ligne -->
+    <div class="modal-backdrop" id="offlineModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2 class="modal-title">Carte Hors-Ligne</h2>
+            </div>
+            <div class="modal-body">
+                <p id="modalDescription">
+                    Téléchargement des tuiles cartographiques (Zoom 13 à 18) pour stocker l'itinéraire dans la mémoire du smartphone.
+                </p>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                    <span class="progress-text" id="progressText">0%</span>
+                </div>
+                <div class="modal-stats">
+                    <span id="tileCountStat">Tuiles : 0 / 0</span>
+                    <span id="tileErrorStat">Erreurs : 0</span>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" id="btnCancelModal">Fermer</button>
+                <button class="modal-btn modal-btn-confirm" id="btnConfirmDownload">Télécharger</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast de Notification -->
+    <div class="toast-msg" id="toastMsg">Notification</div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+            crossorigin=""></script>
+
+    <!-- Moteur Mathématique Géodésique & Anticipation -->
+    <script src="geo-math.js"></script>
+
+    <!-- Application Principale MotoGPS -->
+    <script src="app.js"></script>
+
+</body>
+</html>
