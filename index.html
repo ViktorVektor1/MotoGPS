@@ -6,86 +6,116 @@
     <meta name="theme-color" content="#121212">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="description" content="PWA GPS Moto minimaliste avec guidage dynamique et mode hors-ligne">
+    <meta name="description" content="Navigation GPS Moto minimaliste, ultra-lisible et 100% hors-ligne">
     
     <title>MotoGPS - Navigation</title>
 
-    <!-- Manifest PWA & Favicon -->
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/svg+xml" href="icon.svg">
-    <link rel="apple-touch-icon" href="icon.svg">
+    <!-- Manifest PWA & Favicon avec chemins relatifs stricts -->
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./icon.svg">
+    <link rel="apple-touch-icon" href="./icon.svg">
 
-    <!-- Leaflet CSS -->
+    <!-- Leaflet CSS (CDN) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
           crossorigin="" />
 
-    <!-- Style Minimaliste Mat -->
-    <link rel="stylesheet" href="style.css">
+    <!-- Style CSS Minimaliste Mat -->
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
-    <!-- 1. Carte Leaflet Plein Écran (CartoDB Dark Matter) -->
+    <!-- 1. Fond de Carte Leaflet Plein Écran (CartoDB Dark Matter) -->
     <div id="map"></div>
 
-    <!-- Fond de fermeture pour le menu déroulant -->
+    <!-- Voile transparent de fermeture du menu au toucher extérieur -->
     <div class="menu-backdrop" id="menuBackdrop"></div>
 
-    <!-- 2. Cockpit / Interface Tête Haute (HUD) -->
+    <!-- 2. Surcouche HUD Épurée (Cockpit Moto) -->
     <div class="hud-container">
         
-        <!-- SECTION SUPÉRIEURE DU HUD -->
-        <header class="hud-top">
-            <!-- Pilule de Statuts Discrète -->
-            <div class="status-pill">
-                <div class="status-item" id="gpsStatusBadge">
-                    <span class="status-dot" id="gpsDot"></span>
-                    <span id="gpsText">GPS RECH.</span>
-                </div>
-                <div class="status-item" id="wakeLockBadge" title="Maintien de l'écran allumé">
-                    <span class="status-dot active" id="wakeLockDot"></span>
-                    <span>ÉCRAN ACTIF</span>
-                </div>
-                <div class="status-item" id="zoomBadge">
-                    <span style="color: var(--text-tertiary);">Z</span>
-                    <span id="zoomValue" style="color: var(--text-primary);">16</span>
-                </div>
+        <!-- SECTION SUPÉRIEURE : VITESSE & BANDEAU DE GUIDAGE -->
+        <header class="hud-top-bar">
+            
+            <!-- Compteur de Vitesse Ultra-Discret (Encart Haut Gauche) -->
+            <div class="speed-capsule" aria-label="Compteur de vitesse">
+                <div class="speed-value" id="speedValue">0</div>
+                <div class="speed-unit">KM/H</div>
             </div>
 
-            <!-- Bandeau d'Anticipation de Virage Minimaliste -->
-            <div class="turn-banner" id="turnCard">
-                <div class="turn-icon-wrapper" id="turnIconBox">
-                    <svg class="turn-icon-svg" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="12" y1="19" x2="12" y2="5"></line>
-                        <polyline points="5 12 12 5 19 12"></polyline>
-                    </svg>
+            <!-- Bloc Droite : Statuts + Guidage de Virage -->
+            <div class="hud-top-right">
+                
+                <!-- Statuts Discrets (GPS, Écran, Zoom) -->
+                <div class="status-pill">
+                    <div class="status-item" id="gpsStatusBadge">
+                        <span class="status-dot" id="gpsDot"></span>
+                        <span id="gpsText">GPS RECH.</span>
+                    </div>
+                    <div class="status-item" id="wakeLockBadge" title="Maintien de l'écran allumé">
+                        <span class="status-dot active" id="wakeLockDot"></span>
+                        <span>ÉCRAN</span>
+                    </div>
+                    <div class="status-item" id="zoomBadge">
+                        <span style="color: var(--text-tertiary);">Z</span>
+                        <span id="zoomValue" style="color: var(--text-primary);">16</span>
+                    </div>
                 </div>
-                <div class="turn-details">
-                    <div class="turn-distance" id="turnDistance">-- m</div>
-                    <div class="turn-title" id="turnTitle">EN ATTENTE GPX</div>
-                    <div class="turn-subtitle" id="turnSubtitle">Prêt pour l'itinéraire</div>
+
+                <!-- Bandeau d'Anticipation de Virage -->
+                <div class="turn-banner" id="turnCard">
+                    <div class="turn-icon-box" id="turnIconBox">
+                        <svg class="turn-icon-svg" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="19" x2="12" y2="5"></line>
+                            <polyline points="5 12 12 5 19 12"></polyline>
+                        </svg>
+                    </div>
+                    <div class="turn-content">
+                        <div class="turn-distance" id="turnDistance">-- m</div>
+                        <div class="turn-title" id="turnTitle">EN ATTENTE GPX</div>
+                        <div class="turn-subtitle" id="turnSubtitle">Itinéraire prêt</div>
+                    </div>
                 </div>
+
             </div>
+
         </header>
 
-        <!-- SECTION INFÉRIEURE : COMPTEUR & MENU FLOTTANT (FAB) -->
-        <footer class="hud-bottom-row">
+        <!-- SECTION INFÉRIEURE : BOUTON MENU FLOTTANT (FAB) -->
+        <footer class="hud-bottom-bar">
             
-            <!-- Tachymètre Flottant Minimaliste (Apple / Waze style) -->
-            <div class="speedometer-capsule" aria-label="Compteur de vitesse">
-                <div class="speed-number" id="speedValue">0</div>
-                <div class="speed-label">KM/H</div>
-            </div>
-
-            <!-- Bouton d'Action Flottant (FAB) & Menu Déroulant -->
             <div class="fab-container" id="fabContainer">
                 
-                <!-- Speed Dial / Liste d'Actions Déployée -->
+                <!-- Menu Contextuel Déroulant (Speed Dial) -->
                 <div class="fab-menu-list" id="fabMenuList">
                     
-                    <!-- Action : Centrer / Suivi GPS -->
-                    <button class="fab-menu-item active-tracking" id="btnRecenter" aria-label="Centrer la carte">
-                        <span class="fab-item-label">Centrer GPS</span>
+                    <!-- 1. Importer un GPX -->
+                    <button class="fab-menu-item" id="btnGpx" aria-label="Importer un fichier GPX">
+                        <span class="fab-item-label">Importer un GPX</span>
+                        <div class="fab-item-btn">
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                                <line x1="4" y1="22" x2="4" y2="15"></line>
+                            </svg>
+                        </div>
+                    </button>
+                    <input type="file" id="gpxFileInput" accept=".gpx,application/gpx+xml,text/xml" />
+
+                    <!-- 2. Mode Hors-Ligne (Cache) -->
+                    <button class="fab-menu-item" id="btnOffline" aria-label="Télécharger carte hors-ligne">
+                        <span class="fab-item-label">Mode Hors-ligne (Cache)</span>
+                        <div class="fab-item-btn">
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                        </div>
+                    </button>
+
+                    <!-- 3. Recentrer sur le GPS -->
+                    <button class="fab-menu-item active-tracking" id="btnRecenter" aria-label="Recentrer sur le GPS">
+                        <span class="fab-item-label">Recentrer sur le GPS</span>
                         <div class="fab-item-btn">
                             <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="12" cy="12" r="10"></circle>
@@ -98,34 +128,10 @@
                         </div>
                     </button>
 
-                    <!-- Action : Importer GPX -->
-                    <button class="fab-menu-item" id="btnGpx" aria-label="Importer une trace GPX">
-                        <span class="fab-item-label">Importer GPX</span>
-                        <div class="fab-item-btn">
-                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
-                                <line x1="4" y1="22" x2="4" y2="15"></line>
-                            </svg>
-                        </div>
-                    </button>
-                    <input type="file" id="gpxFileInput" accept=".gpx,application/gpx+xml,text/xml" />
-
-                    <!-- Action : Mode Hors-Ligne -->
-                    <button class="fab-menu-item" id="btnOffline" aria-label="Télécharger carte hors-ligne">
-                        <span class="fab-item-label">Mode Hors-Ligne</span>
-                        <div class="fab-item-btn">
-                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                <polyline points="7 10 12 15 17 10"></polyline>
-                                <line x1="12" y1="15" x2="12" y2="3"></line>
-                            </svg>
-                        </div>
-                    </button>
-
                 </div>
 
-                <!-- Bouton Déclencheur Principal (Trigger Rond) -->
-                <button class="fab-main-trigger" id="fabTrigger" aria-label="Menu des actions" aria-expanded="false">
+                <!-- Bouton Rond Déclencheur Principal (FAB) -->
+                <button class="fab-main-trigger" id="fabTrigger" aria-label="Menu de navigation" aria-expanded="false">
                     <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="4" y1="12" x2="20" y2="12"></line>
                         <line x1="4" y1="6" x2="20" y2="6"></line>
@@ -139,13 +145,13 @@
 
     </div>
 
-    <!-- 3. Boîte de Dialogue Modale : Téléchargement Tuiles Hors-Ligne -->
+    <!-- 3. Boîte de Dialogue Modale : Téléchargement Hors-Ligne -->
     <div class="modal-backdrop" id="offlineModal">
         <div class="modal-box">
             <h2 class="modal-title">Carte Hors-Ligne</h2>
             <div class="modal-body">
                 <p id="modalDescription">
-                    Téléchargement des tuiles pour naviguer en zone blanche sans connexion mobile.
+                    Téléchargement des tuiles pour naviguer sans réseau mobile.
                 </p>
                 <div class="progress-container">
                     <div class="progress-bar" id="progressBar"></div>
@@ -162,19 +168,15 @@
         </div>
     </div>
 
-    <!-- Toast de Notification Discret -->
+    <!-- Notification Toast Discrète -->
     <div class="toast-msg" id="toastMsg">Notification</div>
 
-    <!-- Leaflet JS -->
+    <!-- Scripts avec chemins relatifs stricts -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
             crossorigin=""></script>
-
-    <!-- Moteur Mathématique Géodésique & Anticipation -->
-    <script src="geo-math.js"></script>
-
-    <!-- Application Principale MotoGPS -->
-    <script src="app.js"></script>
+    <script src="./geo-math.js"></script>
+    <script src="./app.js"></script>
 
 </body>
 </html>

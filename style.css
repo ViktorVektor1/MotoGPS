@@ -1,25 +1,25 @@
 /**
  * =====================================================================
- * style.css - Design Système Minimaliste & Mat pour Navigation Moto
+ * style.css - Design Système Minimaliste & Mat (Waze / Apple Maps)
  * =====================================================================
- * Inspiré des interfaces épurées de Waze et Apple Maps :
- * - Fond mat sombre (Apple Dark #1C1C1E) avec flou d'arrière-plan
- * - Couleurs solides (Solid Colors), zéro lueur néon, zéro dégradé
- * - Lisibilité immédiate au guidon avec contraste maximal
- * - Bouton d'action flottant (FAB) escamotable pour dégager la carte
+ * Conçu pour un usage guidon moto :
+ * - Fond mat sombre (Anthracite #121212 / rgba(20, 20, 22, 0.85))
+ * - Effet verre dépoli sans reflets (backdrop-filter: blur(12px))
+ * - Zéro bordures fluorescentes, zéro lueurs néon
+ * - Bouton flottant (FAB) escamotable en bas à droite
+ * - Compteur de vitesse ultra-lisible et discret
  * =====================================================================
  */
 
 :root {
-    /* Palette Apple Dark / Waze Minimaliste */
-    --bg-matte: rgba(28, 28, 30, 0.88);
-    --bg-matte-solid: #1c1c1e;
-    --bg-button: rgba(44, 44, 46, 0.92);
-    --bg-button-active: #3a3a3c;
-    --border-subtle: rgba(255, 255, 255, 0.12);
-    --border-active: rgba(255, 255, 255, 0.25);
+    /* Palette Sombre Mate */
+    --bg-matte: rgba(20, 20, 22, 0.85);
+    --bg-matte-solid: #161618;
+    --bg-button: rgba(36, 36, 40, 0.92);
+    --bg-button-active: #2c2c30;
+    --border-subtle: rgba(255, 255, 255, 0.10);
     
-    /* Couleurs d'accent unies (Solid) */
+    /* Couleurs fonctionnelles solides (Solid Colors) */
     --accent-blue: #0a84ff;
     --accent-green: #30d158;
     --accent-orange: #ff9f0a;
@@ -30,15 +30,14 @@
     --text-secondary: #8e8e93;
     --text-tertiary: #636366;
     
-    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, Roboto, "Segoe UI", sans-serif;
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, Roboto, sans-serif;
     --font-mono: "SF Mono", "Roboto Mono", monospace;
     
-    /* Rayons & Ombres douces */
+    /* Rayons & Ombres */
     --radius-pill: 9999px;
-    --radius-card: 18px;
-    --radius-button: 16px;
-    --shadow-matte: 0 8px 24px rgba(0, 0, 0, 0.45);
-    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --radius-card: 16px;
+    --radius-button: 14px;
+    --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 /* Reset & Plein Écran */
@@ -63,7 +62,7 @@ html, body {
 }
 
 /* =========================================================================
- * 1. CARTE LEAFLET (CartoDB Dark Matter)
+ * 1. FOND DE CARTE LEAFLET (CartoDB Dark Matter)
  * ========================================================================= */
 #map {
     position: absolute;
@@ -93,51 +92,89 @@ html, body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: env(safe-area-inset-top, 16px) env(safe-area-inset-right, 16px) env(safe-area-inset-bottom, 20px) env(safe-area-inset-left, 16px);
+    padding: env(safe-area-inset-top, 14px) env(safe-area-inset-right, 14px) env(safe-area-inset-bottom, 16px) env(safe-area-inset-left, 14px);
 }
 
 /* =========================================================================
- * 3. BANDEAU SUPÉRIEUR (ANTICIPATION DE VIRAGE & STATUS)
+ * 3. SECTION SUPÉRIEURE (COMPTEUR DISCRET & GUIDAGE)
  * ========================================================================= */
-.hud-top {
+.hud-top-bar {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
     width: 100%;
-    max-width: 520px;
+    max-width: 600px;
     margin: 0 auto;
     pointer-events: auto;
 }
 
-/* Pilule de Statuts Discrète */
+/* Compteur de Vitesse Ultra-Discret (Encart Haut Gauche) */
+.speed-capsule {
+    background: var(--bg-matte);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-card);
+    padding: 8px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-soft);
+    min-width: 82px;
+    flex-shrink: 0;
+}
+
+.speed-value {
+    font-size: 2.8rem;
+    font-weight: 800;
+    line-height: 0.9;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -1px;
+}
+
+.speed-unit {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    margin-top: 3px;
+    text-transform: uppercase;
+}
+
+/* Bloc Droite : Statuts + Carte de Guidage de Virage */
+.hud-top-right {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+}
+
+/* Mini Pilule de Statuts */
 .status-pill {
     display: inline-flex;
-    align-self: center;
     align-items: center;
+    justify-content: flex-end;
     gap: 12px;
-    background: var(--bg-matte);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-pill);
-    padding: 5px 14px;
-    box-shadow: var(--shadow-soft);
+    padding: 2px 6px;
 }
 
 .status-item {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    font-size: 0.75rem;
+    gap: 5px;
+    font-size: 0.72rem;
     font-weight: 600;
-    letter-spacing: 0.3px;
     color: var(--text-secondary);
     text-transform: uppercase;
 }
 
 .status-dot {
-    width: 7px;
-    height: 7px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background-color: var(--accent-red);
     transition: background-color 0.3s;
@@ -147,46 +184,47 @@ html, body {
     background-color: var(--accent-green);
 }
 
-/* Carte d'Anticipation de Virage (Style Apple Maps / Waze) */
+/* Bandeau d'Anticipation de Virage Minimaliste */
 .turn-banner {
     background: var(--bg-matte);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-card);
-    padding: 12px 16px;
+    padding: 10px 14px;
     display: flex;
     align-items: center;
-    gap: 14px;
-    box-shadow: var(--shadow-matte);
-    transition: border-color 0.25s, background-color 0.25s;
+    gap: 12px;
+    box-shadow: var(--shadow-soft);
+    transition: background-color 0.25s, border-color 0.25s;
+    min-height: 58px;
 }
 
 .turn-banner.sharp,
 .turn-banner.hairpin {
     border-color: rgba(255, 159, 10, 0.4);
-    background: rgba(38, 30, 20, 0.92);
+    background: rgba(36, 28, 18, 0.92);
 }
 
-.turn-icon-wrapper {
-    width: 48px;
-    height: 48px;
+.turn-icon-box {
+    width: 38px;
+    height: 38px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 10px;
 }
 
 .turn-icon-svg {
-    width: 32px;
-    height: 32px;
+    width: 26px;
+    height: 26px;
     fill: none;
     stroke: var(--text-primary);
 }
 
-.turn-details {
+.turn-content {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -194,8 +232,7 @@ html, body {
 }
 
 .turn-distance {
-    font-family: var(--font-stack);
-    font-size: 1.45rem;
+    font-size: 1.25rem;
     font-weight: 800;
     color: var(--text-primary);
     line-height: 1.1;
@@ -203,7 +240,7 @@ html, body {
 }
 
 .turn-title {
-    font-size: 0.95rem;
+    font-size: 0.88rem;
     font-weight: 700;
     color: var(--text-primary);
     white-space: nowrap;
@@ -213,63 +250,24 @@ html, body {
 }
 
 .turn-subtitle {
-    font-size: 0.75rem;
+    font-size: 0.70rem;
     font-weight: 500;
     color: var(--text-secondary);
-    margin-top: 1px;
 }
 
 /* =========================================================================
- * 4. SECTION INFÉRIEURE : TACHYMÈTRE FLOTTANT & BOUTON MENU (FAB)
+ * 4. SECTION INFÉRIEURE & BOUTON FLOTTANT (FAB)
  * ========================================================================= */
-.hud-bottom-row {
+.hud-bottom-bar {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: flex-end;
     width: 100%;
     max-width: 600px;
     margin: 0 auto;
     pointer-events: auto;
-    position: relative;
 }
 
-/* Tachymètre Flottant Minimaliste (Style Waze / Apple) */
-.speedometer-capsule {
-    background: var(--bg-matte);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--border-subtle);
-    border-radius: 20px;
-    padding: 10px 18px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    box-shadow: var(--shadow-matte);
-    min-width: 100px;
-}
-
-.speed-number {
-    font-size: 3.4rem;
-    font-weight: 800;
-    line-height: 0.92;
-    color: var(--text-primary);
-    font-variant-numeric: tabular-nums;
-    letter-spacing: -1px;
-}
-
-.speed-label {
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    color: var(--text-secondary);
-    margin-top: 4px;
-    text-transform: uppercase;
-}
-
-/* =========================================================================
- * 5. MENU D'ACTION FLOTTANT (FAB & SPEED DIAL)
- * ========================================================================= */
 .fab-container {
     position: relative;
     display: flex;
@@ -277,19 +275,19 @@ html, body {
     align-items: flex-end;
 }
 
-/* Menu Déroulant Escamotable (Speed Dial) */
+/* Menu Contextuel Escamotable (Speed Dial) */
 .fab-menu-list {
     position: absolute;
-    bottom: 70px;
+    bottom: 68px;
     right: 0;
     display: flex;
     flex-direction: column;
     gap: 10px;
     align-items: flex-end;
     opacity: 0;
-    transform: translateY(16px) scale(0.92);
+    transform: translateY(14px) scale(0.92);
     pointer-events: none;
-    transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 1050;
 }
 
@@ -299,7 +297,6 @@ html, body {
     pointer-events: auto;
 }
 
-/* Éléments individuels du menu */
 .fab-menu-item {
     display: flex;
     align-items: center;
@@ -312,17 +309,16 @@ html, body {
 
 .fab-item-label {
     background: var(--bg-matte);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--border-subtle);
     color: var(--text-primary);
-    font-size: 0.85rem;
+    font-size: 0.84rem;
     font-weight: 600;
     padding: 8px 14px;
     border-radius: var(--radius-pill);
     box-shadow: var(--shadow-soft);
     white-space: nowrap;
-    letter-spacing: -0.2px;
 }
 
 .fab-item-btn {
@@ -330,14 +326,14 @@ html, body {
     height: 52px;
     border-radius: 50%;
     background: var(--bg-button);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--border-subtle);
     color: var(--text-primary);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: var(--shadow-matte);
+    box-shadow: var(--shadow-soft);
     transition: transform 0.12s, background-color 0.15s;
 }
 
@@ -361,10 +357,10 @@ html, body {
     color: #ffffff;
 }
 
-/* Bouton Principal Flottant (Trigger) */
+/* Bouton Principal Flottant (FAB Trigger) */
 .fab-main-trigger {
-    width: 60px;
-    height: 60px;
+    width: 58px;
+    height: 58px;
     border-radius: 50%;
     background: var(--bg-matte-solid);
     border: 1px solid var(--border-subtle);
@@ -373,8 +369,8 @@ html, body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: var(--shadow-matte);
-    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s;
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s;
     outline: none;
     z-index: 1060;
 }
@@ -384,24 +380,23 @@ html, body {
 }
 
 .fab-main-trigger svg {
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
     stroke: currentColor;
     stroke-width: 2.2;
     fill: none;
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Rotation de l'icône lors de l'ouverture */
 .fab-container.open .fab-main-trigger {
-    background-color: #2c2c2e;
+    background-color: #242428;
 }
 
 .fab-container.open .fab-main-trigger svg {
     transform: rotate(90deg);
 }
 
-/* Fond obscurcisseur pour fermer au clic dehors */
+/* Fond transparent pour fermeture au clic dehors */
 .menu-backdrop {
     position: fixed;
     top: 0;
@@ -419,14 +414,14 @@ html, body {
 }
 
 /* =========================================================================
- * 6. MARQUEUR DE POSITION MOTO (STYLE ÉPURÉ)
+ * 5. MARQUEUR DE POSITION MOTO
  * ========================================================================= */
 .moto-marker-container {
     position: relative;
-    width: 52px;
-    height: 52px;
-    margin-left: -26px;
-    margin-top: -26px;
+    width: 48px;
+    height: 48px;
+    margin-left: -24px;
+    margin-top: -24px;
     pointer-events: none;
 }
 
@@ -443,13 +438,13 @@ html, body {
 }
 
 .moto-marker-arrow svg {
-    width: 38px;
-    height: 38px;
-    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+    width: 36px;
+    height: 36px;
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.6));
 }
 
 /* =========================================================================
- * 7. BOÎTE DE DIALOGUE MODALE (CARTE HORS-LIGNE)
+ * 6. MODALE HORS-LIGNE (CACHE TUILES)
  * ========================================================================= */
 .modal-backdrop {
     position: fixed;
@@ -478,37 +473,36 @@ html, body {
 .modal-box {
     background: var(--bg-matte-solid);
     border: 1px solid var(--border-subtle);
-    border-radius: 22px;
+    border-radius: 20px;
     width: 100%;
-    max-width: 420px;
-    padding: 24px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    max-width: 400px;
+    padding: 22px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
 }
 
 .modal-title {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     font-weight: 700;
     color: var(--text-primary);
-    letter-spacing: -0.3px;
 }
 
 .modal-body {
-    font-size: 0.92rem;
+    font-size: 0.90rem;
     line-height: 1.45;
     color: var(--text-secondary);
 }
 
 .progress-container {
     width: 100%;
-    height: 12px;
-    background: #2c2c2e;
-    border-radius: 6px;
+    height: 10px;
+    background: #242428;
+    border-radius: 5px;
     overflow: hidden;
     position: relative;
-    margin: 12px 0 6px 0;
+    margin: 10px 0 4px 0;
 }
 
 .progress-bar {
@@ -521,7 +515,7 @@ html, body {
 .modal-stats {
     display: flex;
     justify-content: space-between;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 600;
     color: var(--text-tertiary);
 }
@@ -529,14 +523,14 @@ html, body {
 .modal-actions {
     display: flex;
     gap: 10px;
-    margin-top: 6px;
+    margin-top: 4px;
 }
 
 .modal-btn {
     flex: 1;
     height: 48px;
-    border-radius: 14px;
-    font-size: 0.95rem;
+    border-radius: 12px;
+    font-size: 0.92rem;
     font-weight: 600;
     cursor: pointer;
     border: none;
@@ -545,7 +539,6 @@ html, body {
 
 .modal-btn:active {
     transform: scale(0.97);
-    opacity: 0.85;
 }
 
 .modal-btn-confirm {
@@ -554,31 +547,30 @@ html, body {
 }
 
 .modal-btn-cancel {
-    background: #2c2c2e;
+    background: #242428;
     color: var(--text-primary);
 }
 
-/* Input Fichier Caché */
 #gpxFileInput {
     display: none;
 }
 
 /* =========================================================================
- * 8. TOAST NOTIFICATIONS (STYLE PILULE MATTE)
+ * 7. TOAST NOTIFICATION
  * ========================================================================= */
 .toast-msg {
     position: fixed;
-    top: 75px;
+    top: 70px;
     left: 50%;
     transform: translateX(-50%) translateY(-20px);
     background: var(--bg-matte-solid);
     border: 1px solid var(--border-subtle);
     color: var(--text-primary);
-    padding: 10px 20px;
+    padding: 8px 18px;
     border-radius: var(--radius-pill);
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 600;
-    box-shadow: var(--shadow-matte);
+    box-shadow: var(--shadow-soft);
     opacity: 0;
     pointer-events: none;
     transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s;

@@ -1,10 +1,9 @@
 /**
  * =====================================================================
- * app.js - Logique Principale MotoGPS (Design Épuré & Mat)
+ * app.js - Logique Principale MotoGPS (GitHub Pages & Design Mat Waze)
  * =====================================================================
- * Gère l'initialisation de la carte CartoDB Dark Matter, le menu FAB
- * escamotable, la géolocalisation haute précision, le tracé GPX unifié
- * et l'anticipation dynamique des virages.
+ * Gère Leaflet (CartoDB Dark Matter), la géolocalisation haute précision,
+ * le menu FAB escamotable, le Screen Wake Lock et le tracé GPX uni.
  * =====================================================================
  */
 
@@ -67,24 +66,24 @@
     };
 
     // =========================================================================
-    // 1. INITIALISATION DE LA CARTE LEAFLET (CartoDB Dark Matter)
+    // 1. INITIALISATION CARTE LEAFLET (CartoDB Dark Matter)
     // =========================================================================
     function initMap() {
         state.map = L.map('map', {
             center: DEFAULT_COORDS,
             zoom: DEFAULT_ZOOM,
-            zoomControl: false, // Interface épurée sans boutons +/-
+            zoomControl: false,
             attributionControl: false,
             preferCanvas: true
         });
 
-        // Fond de carte CartoDB Dark Matter (Sombre, mat, épuré, idéal pour GPS moto)
+        // Fond de carte sombre mat CartoDB Dark Matter
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             maxZoom: 19,
             subdomains: ['a', 'b', 'c', 'd']
         }).addTo(state.map);
 
-        // Curseur de navigation moto minimaliste (Chevron bleu électrique Apple / Waze)
+        // Curseur de navigation moto minimaliste (Chevron bleu électrique)
         const motoIcon = L.divIcon({
             className: 'moto-custom-icon',
             html: `
@@ -96,8 +95,8 @@
                     </div>
                 </div>
             `,
-            iconSize: [52, 52],
-            iconAnchor: [26, 26]
+            iconSize: [48, 48],
+            iconAnchor: [24, 24]
         });
 
         state.userMarker = L.marker(DEFAULT_COORDS, {
@@ -117,7 +116,7 @@
             state.markerElement = document.getElementById('motoArrow');
         }, 100);
 
-        // Détection du déplacement manuel de la carte (désactive le mode centrage)
+        // Déplacement manuel : désactiver le mode centrage automatique
         state.map.on('dragstart', () => {
             setFollowMode(false);
             closeMenu();
@@ -139,7 +138,7 @@
     // =========================================================================
     function initGeolocation() {
         if (!('geolocation' in navigator)) {
-            showToast('GPS non supporté sur cet appareil');
+            showToast('GPS non supporté');
             dom.gpsText.textContent = 'GPS ABSENT';
             return;
         }
@@ -167,7 +166,6 @@
         dom.gpsDot.classList.add('active');
         dom.gpsText.textContent = `GPS (±${Math.round(accuracy)}m)`;
 
-        // Vitesse instantanée (m/s -> km/h)
         let speed = (coords.speed !== null && !isNaN(coords.speed) && coords.speed >= 0)
             ? Math.round(coords.speed * 3.6)
             : 0;
@@ -175,7 +173,6 @@
         state.speedKmh = speed;
         dom.speedValue.textContent = speed;
 
-        // Cap directionnel (Heading)
         let heading = coords.heading;
         if (heading === null || isNaN(heading)) {
             if (state.previousPos && speed >= 3) {
@@ -209,7 +206,7 @@
     }
 
     function onLocationError(error) {
-        console.warn('[GPS] Signal perdu :', error.message);
+        console.warn('[GPS] Erreur :', error.message);
         dom.gpsDot.classList.remove('active');
         dom.gpsText.textContent = 'GPS PERDU';
     }
@@ -234,7 +231,7 @@
     }
 
     // =========================================================================
-    // 3. MAINTIEN DE L'ÉCRAN ACTIF (SCREEN WAKE LOCK API)
+    // 3. MAINTIEN DE L'ÉCRAN ACTIF (SCREEN WAKE LOCK)
     // =========================================================================
     async function requestWakeLock() {
         if ('wakeLock' in navigator) {
@@ -259,7 +256,7 @@
     });
 
     // =========================================================================
-    // 4. MOTEUR GPX (TRACÉ SOLIDE ÉPURÉ HAUT CONTRASTE)
+    // 4. MOTEUR GPX (TRACÉ UNIFIÉ SANS DÉGRADÉ)
     // =========================================================================
     function initGpxLoader() {
         dom.btnGpx.addEventListener('click', () => {
@@ -316,11 +313,11 @@
             const distKm = (totalDistMeters / 1000).toFixed(1);
 
             showToast(`GPX : ${distKm} km (${points.length} pts)`);
-            dom.turnTitle.textContent = 'TRACÉ ACTIF';
-            dom.turnSubtitle.textContent = `${distKm} km • Guidage prêt`;
+            dom.turnTitle.textContent = 'TRACÉ CHARGÉ';
+            dom.turnSubtitle.textContent = `${distKm} km • Guidage actif`;
 
         } catch (err) {
-            console.error('[GPX] Erreur parsing :', err);
+            console.error('[GPX] Erreur :', err);
             showToast('Erreur décodage GPX');
         }
     }
@@ -331,26 +328,26 @@
         if (state.trackCasingLayer) state.map.removeLayer(state.trackCasingLayer);
         if (state.trackMainLayer) state.map.removeLayer(state.trackMainLayer);
 
-        // Bordure sombre mate de contraste (Casing)
+        // Sous-couche de contraste noir mat
         state.trackCasingLayer = L.polyline(latLngs, {
             color: '#000000',
-            weight: 9,
-            opacity: 0.7,
+            weight: 8,
+            opacity: 0.8,
             lineCap: 'round',
             lineJoin: 'round'
         }).addTo(state.map);
 
-        // Tracé principal solide (Bleu électrique uni, sans dégradé)
+        // Ligne principale Bleu Électrique pur (épaisseur nette 4.5px)
         state.trackMainLayer = L.polyline(latLngs, {
             color: '#0A84FF',
-            weight: 5.5,
+            weight: 4.5,
             opacity: 1.0,
             lineCap: 'round',
             lineJoin: 'round'
         }).addTo(state.map);
 
         const bounds = state.trackMainLayer.getBounds();
-        state.map.fitBounds(bounds, { padding: [60, 60], maxZoom: 17 });
+        state.map.fitBounds(bounds, { padding: [50, 50], maxZoom: 17 });
     }
 
     // =========================================================================
@@ -362,7 +359,7 @@
         const closest = GeoMath.findClosestSegment(state.currentPos, state.trackPoints, state.lastClosestSegmentIndex);
         state.lastClosestSegmentIndex = closest.segmentIndex;
 
-        // Hors itinéraire (> 150m)
+        // Hors trace (> 150m)
         if (closest.distanceToTrack > 150) {
             dom.turnCard.className = 'turn-banner';
             dom.turnDistance.textContent = `${Math.round(closest.distanceToTrack)} m`;
@@ -423,38 +420,30 @@
 
         switch (type) {
             case 'hairpin-left':
-                svgContent = `<path d="M19 20V9a7 7 0 0 0-14 0v11" stroke="#FF9F0A" stroke-width="2.8" stroke-linecap="round"/>
-                              <polyline points="9 16 5 20 1 16" stroke="#FF9F0A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>`;
+                svgContent = `<path d="M19 20V9a7 7 0 0 0-14 0v11" stroke="#FF9F0A" stroke-width="2.8" stroke-linecap="round"/><polyline points="9 16 5 20 1 16" stroke="#FF9F0A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>`;
                 break;
             case 'hairpin-right':
-                svgContent = `<path d="M5 20V9a7 7 0 0 1 14 0v11" stroke="#FF9F0A" stroke-width="2.8" stroke-linecap="round"/>
-                              <polyline points="15 16 19 20 23 16" stroke="#FF9F0A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>`;
+                svgContent = `<path d="M5 20V9a7 7 0 0 1 14 0v11" stroke="#FF9F0A" stroke-width="2.8" stroke-linecap="round"/><polyline points="15 16 19 20 23 16" stroke="#FF9F0A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>`;
                 break;
             case 'sharp-left':
-                svgContent = `<path d="M18 19V9a4 4 0 0 0-4-4H5" stroke="#FF9F0A" stroke-width="2.8" stroke-linecap="round"/>
-                              <polyline points="9 1 4 6 9 11" stroke="#FF9F0A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>`;
+                svgContent = `<path d="M18 19V9a4 4 0 0 0-4-4H5" stroke="#FF9F0A" stroke-width="2.8" stroke-linecap="round"/><polyline points="9 1 4 6 9 11" stroke="#FF9F0A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>`;
                 break;
             case 'sharp-right':
-                svgContent = `<path d="M6 19V9a4 4 0 0 1 4-4h9" stroke="#FF9F0A" stroke-width="2.8" stroke-linecap="round"/>
-                              <polyline points="15 1 20 6 15 11" stroke="#FF9F0A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>`;
+                svgContent = `<path d="M6 19V9a4 4 0 0 1 4-4h9" stroke="#FF9F0A" stroke-width="2.8" stroke-linecap="round"/><polyline points="15 1 20 6 15 11" stroke="#FF9F0A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>`;
                 break;
             case 'turn-left':
             case 'slight-left':
-                svgContent = `<path d="M17 19a9 9 0 0 0-9-9H6" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/>
-                              <polyline points="10 6 6 10 10 14" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`;
+                svgContent = `<path d="M17 19a9 9 0 0 0-9-9H6" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/><polyline points="10 6 6 10 10 14" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`;
                 break;
             case 'turn-right':
             case 'slight-right':
-                svgContent = `<path d="M7 19a9 9 0 0 1 9-9h2" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/>
-                              <polyline points="14 6 18 10 14 14" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`;
+                svgContent = `<path d="M7 19a9 9 0 0 1 9-9h2" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/><polyline points="14 6 18 10 14 14" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`;
                 break;
             case 'off-track':
-                svgContent = `<line x1="18" y1="6" x2="6" y2="18" stroke="#FF453A" stroke-width="2.8" stroke-linecap="round"/>
-                              <line x1="6" y1="6" x2="18" y2="18" stroke="#FF453A" stroke-width="2.8" stroke-linecap="round"/>`;
+                svgContent = `<line x1="18" y1="6" x2="6" y2="18" stroke="#FF453A" stroke-width="2.8" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke="#FF453A" stroke-width="2.8" stroke-linecap="round"/>`;
                 break;
-            default: // Ligne droite
-                svgContent = `<line x1="12" y1="19" x2="12" y2="5" stroke="#30D158" stroke-width="2.8" stroke-linecap="round"/>
-                              <polyline points="5 12 12 5 19 12" stroke="#30D158" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>`;
+            default:
+                svgContent = `<line x1="12" y1="19" x2="12" y2="5" stroke="#30D158" stroke-width="2.8" stroke-linecap="round"/><polyline points="5 12 12 5 19 12" stroke="#30D158" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>`;
                 break;
         }
 
@@ -469,18 +458,14 @@
     // 6. GESTION DU MENU FLOTTANT (FAB) & CONTRÔLES UI
     // =========================================================================
     function initUIControls() {
-        // Toggle du Menu FAB
         dom.fabTrigger.addEventListener('click', (e) => {
             e.stopPropagation();
             toggleMenu();
         });
 
-        // Clic sur l'overlay pour fermer
-        dom.menuBackdrop.addEventListener('click', () => {
-            closeMenu();
-        });
+        dom.menuBackdrop.addEventListener('click', () => closeMenu());
 
-        // Bouton Centrage / Suivi
+        // Action : Recentrer sur le GPS
         dom.btnRecenter.addEventListener('click', (e) => {
             e.stopPropagation();
             setFollowMode(true);
@@ -488,7 +473,7 @@
             closeMenu();
         });
 
-        // Bouton Mode Hors-ligne
+        // Action : Mode Hors-Ligne
         dom.btnOffline.addEventListener('click', (e) => {
             e.stopPropagation();
             closeMenu();
@@ -497,11 +482,7 @@
     }
 
     function toggleMenu() {
-        if (state.isMenuOpen) {
-            closeMenu();
-        } else {
-            openMenu();
-        }
+        state.isMenuOpen ? closeMenu() : openMenu();
     }
 
     function openMenu() {
@@ -536,16 +517,11 @@
     }
 
     // =========================================================================
-    // 7. GESTION DE LA CARTE HORS-LIGNE & TÉLÉCHARGEMENT
+    // 7. GESTION DE LA CARTE HORS-LIGNE (CACHE)
     // =========================================================================
     function initOfflineManager() {
-        dom.btnCancelModal.addEventListener('click', () => {
-            dom.offlineModal.classList.remove('active');
-        });
-
-        dom.btnConfirmDownload.addEventListener('click', () => {
-            startTileDownload();
-        });
+        dom.btnCancelModal.addEventListener('click', () => dom.offlineModal.classList.remove('active'));
+        dom.btnConfirmDownload.addEventListener('click', startTileDownload);
 
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.addEventListener('message', (event) => {
@@ -616,7 +592,7 @@
         if (navigator.serviceWorker && navigator.serviceWorker.controller) {
             navigator.serviceWorker.controller.postMessage({
                 type: 'START_TILE_DOWNLOAD',
-                tileUrls: tileUrls
+                tileUrls
             });
         } else {
             await downloadTilesDirectly(tileUrls);
@@ -625,7 +601,7 @@
 
     async function downloadTilesDirectly(urls) {
         try {
-            const cache = await caches.open('motogps-tiles-v1');
+            const cache = await caches.open('motogps-tiles-v2');
             const total = urls.length;
             let downloaded = 0;
             let errors = 0;
@@ -655,9 +631,9 @@
 
             dom.btnConfirmDownload.disabled = false;
             dom.btnConfirmDownload.textContent = 'Terminé';
-            showToast('Mise en cache hors-ligne terminée');
+            showToast('Mise en cache terminée');
         } catch (err) {
-            console.error('[Cache] Erreur de téléchargement :', err);
+            console.error('[Cache] Erreur :', err);
             showToast('Erreur de téléchargement');
             dom.btnConfirmDownload.disabled = false;
             dom.btnConfirmDownload.textContent = 'Réessayer';
@@ -665,15 +641,24 @@
     }
 
     // =========================================================================
-    // 8. SERVICE WORKER & INITIALISATION
+    // 8. SERVICE WORKER & DÉMARRAGE (CHEMIN RELATIF GITHUB PAGES)
     // =========================================================================
     function registerServiceWorker() {
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
+            // Enregistrement avec chemin relatif strict './sw.js'
+            // Vérifie si la page est déjà chargée pour éviter la race condition
+            // DOMContentLoaded → window.load (le listener load ne serait jamais appelé)
+            const doRegister = () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('[SW] Enregistré :', reg.scope))
-                    .catch(err => console.warn('[SW] Erreur :', err));
-            });
+                    .then(reg => console.log('[SW] Enregistré sur le scope :', reg.scope))
+                    .catch(err => console.warn('[SW] Échec enregistrement :', err));
+            };
+
+            if (document.readyState === 'complete') {
+                doRegister();
+            } else {
+                window.addEventListener('load', doRegister);
+            }
         }
     }
 
@@ -686,5 +671,4 @@
         requestWakeLock();
         registerServiceWorker();
     });
-
 })();
